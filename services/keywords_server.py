@@ -1,26 +1,26 @@
-from services.encoders.infer_sent import InferSent
+from services.extract_keywords import KeywordExtractor
 import os
 import pika
 import json
 
 
-
+keyword_extractor = KeywordExtractor()
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(host='localhost'))
 
 channel = connection.channel()
-queue = 'infer#en'
+queue = 'KeywordExtractor#en'
 
 channel.queue_declare(queue=queue)
 
 def extract(text):
     text = text.decode("utf-8") .strip()
-    return infer.encode(text)
+    return keyword_extractor.get_keywords(text)
 
 def on_request(ch, method, props, body):
-    print(" [.] encode(%s)" % body)
+    print(" [.] extract(%s)" % body)
     # response = encode(body)
     response = {'keywords': extract(body)}
     response = json.dumps(response)
